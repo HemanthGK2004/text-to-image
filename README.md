@@ -1,4 +1,3 @@
-
 # **Noobshot.ai** 🚀: Turn ideas and imagination into images in milliseconds. ✨
 
 | "A sultry cyberpunk girl engineer with a robotic arm assembles futuristic tech amid soaring skyscrapers and flying vehicles." 🛠️ | "An anime boy with blue hair in neon attire codes on a laptop, with a glowing Lord Shri Krishna behind him." 💻 |
@@ -15,7 +14,7 @@
 1. **Clone the Repo:** 📥
    ```bash
    git clone https://github.com/ARYANK-08/text2img-ontheflybro.git
-   cd <your-repo-name>
+   cd text2img-ontheflybro
    ```
 
 2. **Create and Activate Virtual Environment:** 🌱
@@ -30,10 +29,10 @@
    pip install -r requirements.txt
    ```
 
-4. **Set Up Environment Variable:** ⚙️
-   Create a `.env` file:
+4. **Set Up Environment Variable:** ⚙️  
+   Create a `.env` file in the root directory and add your API key:
    ```
-   TOGETHER_API_KEY=''
+   TOGETHER_API_KEY='your_api_key_here'
    ```
 
 5. **Run the App:** ▶️
@@ -42,6 +41,4 @@
    ```
 
 ## Access 🔗
-Visit `http://127.0.0.1:5000` in your browser. 🌐
-
-
+Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser. 🌐
