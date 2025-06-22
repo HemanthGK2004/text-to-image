@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>noobshot.ai</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/68/68155.png" type="image/png">
+
+    <style>
+        /* Import custom font */
+        @font-face {
+            font-family: "Geist";
+            src: url("https://pham.codes/d/GeistMonoVF.woff2") format("woff2");
+        }
+
+        /* Reset and Base Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            color: #ffffff;
+            font-family: "Geist", sans-serif;
+            overflow-y: auto;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .navbar h2 {
+            font-size: 28px;
+            background: linear-gradient(45deg, #ffffff, #a1a1a1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+            100% { text-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
+        }
+
+        /* Social Icons */
+        .social-icons a {
+            color: #ffffff;
+            font-size: 20px;
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        .social-icons a:hover {
+            transform: scale(1.2);
+            color: #00aaff;
+        }
+
+        /* Input Area */
+        .input-group {
+            width: 90%;
+            max-width: 600px;
+            margin: 100px auto 30px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group h5 {
+            font-size: 18px;
+            color: #cccccc;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            resize: none;
+            height: 120px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00aaff;
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+        }
+
+        /* API Warning */
+        .api-warning {
+            color: #ff4d4d;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .setup-instructions {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        /* Loading Animation */
+        #loading {
+            display: none;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #00aaff;
+        }
+
+        .loader {
+            border: 3px solid #ffffff;
+            border-top: 3px solid #00aaff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error Message */
+        .error {
+            color: #ff4d4d;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Image Container */
+        .image-container {
+            margin: 20px auto;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+
+        #generatedImage {
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, opacity 0.3s;
+            display: none;
+        }
+
+        #generatedImage:hover {
+            transform: scale(1.02);
+            opacity: 0.95;
+        }
+
+        /* Gallery */
+        .gallery {
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(0, 170, 255, 0.5);
+        }
+
+        /* Footer Text */
+        p {
+            font-size: 14px;
+            color: #cccccc;
+            margin: 20px 0;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 10px 20px;
+            }
+
+            .navbar h2 {
+                font-size: 22px;
+            }
+
+            .input-group {
+                margin: 80px auto 20px;
+                padding: 15px;
+            }
+
+            .input-group h5 {
+                font-size: 16px;
+            }
+
+            textarea {
+                height: 100px;
+                font-size: 14px;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+
+            .thumbnail {
+                aspect-ratio: 1/1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>noobshot.ai</h2>
+        <div class="social-icons">
+            <a href="https://noobshot.ai" target="_blank" title="Noobshot AI"><i class="fas fa-robot"></i></a>
+            <a href="https://github.com/ARYANK-08/text2img-ontheflybro" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/aryankyatham/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="https://x.com/kyathamaryan_" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <h5>Imagine your thoughts into reality 💭</h5>
+        {% if not has_api_key %}
+        <div class="api-warning">⚠️ Together API key not configured. Click for setup instructions.</div>
+        <div class="setup-instructions" style="display: none;">
+            <h3>Setup Instructions:</h3>
+            <ol>
+                <li>Set up your API key in the application environment.</li>
+                <li>Restart the app after adding your key.</li>
+                <li>Enter a prompt to generate an image!</li>
+            </ol>
+        </div>
+        {% endif %}
+
+        <textarea id="prompt" placeholder="Type your imagination here..."></textarea>
+        <div id="loading">Imagining... <span class="loader"></span></div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <div class="image-container">
+        <img id="generatedImage" alt="Generated Image">
+    </div>
+
+    <div class="gallery" id="gallery"></div>
+    <p>Generate images on the fly 🚀</p>
+
+    <script>
+        $(document).ready(function() {
+            const previousImages = [];
+
+            // Toggle setup instructions
+            $('.api-warning').click(function() {
+                $('.setup-instructions').slideToggle();
+            });
+
+            // Generate image
+            function generateImage() {
+                const prompt = $('#prompt').val();
+                if (prompt) {
+                    $('#loading').show();
+                    $('#error').hide();
+
+                    $.ajax({
+                        url: '/generate',
+                        method: 'POST',
+                        data: { prompt: prompt },
+                        success: function(response) {
+                            $('#loading').hide();
+                            if (response.image) {
+                                const imageUrl = 'data:image/png;base64,' + response.image;
+                                $('#generatedImage').attr('src', imageUrl).fadeIn();
+                                previousImages.push(imageUrl);
+                                updateGallery();
+                            }
+                        },
+                        error: function(xhr) {
+                            $('#loading').hide();
+                            const errorMsg = xhr.responseJSON?.error || 'Something went wrong!';
+                            $('#error').text(errorMsg).show();
+                        }
+                    });
+                } else {
+                    $('#error').text('Please enter a prompt.').show();
+                }
+            }
+
+            // Update gallery
+            function updateGallery() {
+                const gallery = $('#gallery');
+                gallery.empty();
+                previousImages.slice(-6).forEach((image) => {
+                    const thumb = $('<div class="thumbnail"><img src="' + image + '"></div>');
+                    thumb.click(() => {
+                        $('#generatedImage').attr('src', image).fadeIn();
+                    });
+                    gallery.append(thumb);
+                });
+            }
+
+            // Debounce input
+            let debounceTimeout;
+            $('#prompt').on('input', function() {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(generateImage, 500);
+            });
+        });
+    </script>
+</body>
+</html>
